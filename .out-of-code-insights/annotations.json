@@ -1,1 +1,83 @@
-[]
+[
+  {
+    "id": "mhwcup4sfxot33you97",
+    "file": "FileDedupeApp/core/ScanManager.cs",
+    "line": 15,
+    "message": "Filter the dictionary to only include key-value pairs where the value list has more than 1 item",
+    "author": "Anonymous",
+    "timestamp": "2025-11-12T21:11:30.477Z",
+    "thread": [],
+    "tags": [
+      "Notes"
+    ],
+    "pinned": false,
+    "priority": 0,
+    "severity": "info",
+    "resolved": false,
+    "kanbanColumn": "todo"
+  },
+  {
+    "id": "mhwcw9dzq67xgi023s",
+    "file": "FileDedupeApp/core/ScanManager.cs",
+    "line": 16,
+    "message": "Converts the key-value pairs to a list of the values. The results look like: [[List<FileMetaData>], [List<FileMetaData>], ...]",
+    "author": "Anonymous",
+    "timestamp": "2025-11-12T21:11:40.184Z",
+    "thread": [],
+    "tags": [
+      "Notes"
+    ],
+    "pinned": false,
+    "priority": 0,
+    "severity": "info",
+    "resolved": false,
+    "kanbanColumn": "todo"
+  },
+  {
+    "id": "mhwd3aoipxblviwgiio",
+    "file": "FileDedupeApp/core/FileHasher.cs",
+    "line": 39,
+    "message": "When all the threads are done, we signal to the consumers of the outputqueue it will not be getting any more items. After the remaining items are consumed, consumer threads are allowed to gracefully exit. That way, they don't hang indefinitely waiting for more items that will never come, avoiding potential deadlocks.",
+    "author": "Anonymous",
+    "timestamp": "2025-11-12T21:11:49.764Z",
+    "thread": [],
+    "tags": [
+      "Notes"
+    ],
+    "pinned": false,
+    "priority": 0,
+    "severity": "info",
+    "resolved": false,
+    "kanbanColumn": "todo"
+  },
+  {
+    "id": "mhwif1ju8jxk46mpqjl",
+    "file": "FileDedupeApp/core/DirectoryScanner.cs",
+    "line": 29,
+    "message": "Checks if the key exists, but does not throw an exception if it doesn't, reducing overhead",
+    "author": "Anonymous",
+    "timestamp": "2025-11-12T21:26:02.394Z",
+    "thread": [],
+    "tags": [],
+    "pinned": false,
+    "priority": 0,
+    "severity": "info",
+    "resolved": false,
+    "kanbanColumn": "todo"
+  },
+  {
+    "id": "mhwifmmherf02pyr9gq",
+    "file": "FileDedupeApp/core/DirectoryScanner.cs",
+    "line": 30,
+    "message": "Out variables are defiend by the method. The method outputs them to the caller. They become available to use by the caller",
+    "author": "Anonymous",
+    "timestamp": "2025-11-12T21:26:29.705Z",
+    "thread": [],
+    "tags": [],
+    "pinned": false,
+    "priority": 0,
+    "severity": "info",
+    "resolved": false,
+    "kanbanColumn": "todo"
+  }
+]

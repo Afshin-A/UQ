@@ -1,20 +1,16 @@
 using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 
 
 namespace FileDedupeApp.core
 {
 
     /// <summary>
-    ///  Scans directories and adds file paths to a BlockingCollection<string>
+    ///  Given a list of root paths, scans directories recursively and adds files to a map where key is file size and value is list of FileMetaData (path and size).
     /// </summary>
-    public class DirectoryScanner
+    public class DirectoryScanner(Dictionary<long, List<FileEntry>> sizeGroups)
     {
-        // A thread-safe collection to hold file paths. Provides coarse-grained blocking for producer and consumer threads.
-        private readonly BlockingCollection<string> _fileQueue;
-        public DirectoryScanner(BlockingCollection<string> fileQueue)
-        {
-            _fileQueue = fileQueue;
-        }
+        private Dictionary<long, List<FileEntry>> _sizeGroups = sizeGroups;
 
         public void Scan(IEnumerable<string> rootPaths)
         {
@@ -22,11 +18,31 @@ namespace FileDedupeApp.core
             {
                 foreach (var file in Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories))
                 {
-                    _fileQueue.Add(file);
+                    try
+                    {
+                        // TOOD: Remove this
+                        // Console.WriteLine($"Scanning file: {file}");
+                        var fileInfo = new FileInfo(file);
+                        // checks if the key exists, but does not throw an exception if it doesn't, reducing overhead
+                        // out variables are defiend by the method. The method outputs them to the caller. They become available to use by the caller
+                        // In this case, if the key doesn't exists, we assign a new list to the out variable group
+                        if (!_sizeGroups.TryGetValue(
+                            fileInfo.Length,
+                            out var group
+                        ))
+                        {
+                            group = new List<FileEntry>();
+                            _sizeGroups[fileInfo.Length] = group;
+                        }
+                        // we then add an item to the out variable
+                        group.Add(new FileEntry(path: fileInfo.FullName, size: fileInfo.Length));
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error processing file {file}: {ex.Message}");
+                    }
                 }
             }
-            // why is this necessary? it is to signal to consumer threads that no more items will be added, so they won't hang indefinitely waiting for more items.
-            _fileQueue.CompleteAdding();
         }
-    }
+    }        
 }

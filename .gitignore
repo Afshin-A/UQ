@@ -482,3 +482,10 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Annotation files for Visual Studio Code's Code Insights feature
+# .out-of-code-insights
+
+# Notes 
+notes.md
+
