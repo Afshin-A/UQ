@@ -1,21 +1,21 @@
 using System.Collections.Concurrent;
+using System.IO.Hashing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.IO.Hashing;
 
-namespace FileDedupeApp.core
+namespace UQApp.core
 {
-    public class DuplicateFinderService(
-        ILogger<DuplicateFinderService> logger,
+    public class UQService(
+        ILogger<UQService> logger,
         IConfiguration configuration,
         IOptions<UQOptions> options,
         DirectoryScanner scanner,
         FileHasher hasher
     ) : BackgroundService
     {
-        private readonly ILogger<DuplicateFinderService> _logger = logger;
+        private readonly ILogger<UQService> _logger = logger;
         private readonly IConfiguration _configuration = configuration;
         private readonly FileHasher _hasher = hasher;
         private readonly DirectoryScanner _scanner = scanner;
@@ -39,7 +39,7 @@ namespace FileDedupeApp.core
                 // TODO: Need to free resources once we're done with them
                 // TODO: Add support for a new search after duplicates are found
 
-                //SECTION STAGE 1: DIRECTORY SCANNING
+                // SECTION STAGE 1: DIRECTORY SCANNING
                 IEnumerable<List<FileEntry>>? potentialPartialDuplicates = _scanner.Scan(directoriesToScan, ct);
                 if (ct.IsCancellationRequested) return;
                 // If no potential duplicates found based on size, exit early
@@ -48,9 +48,9 @@ namespace FileDedupeApp.core
                     _logger.LogInformation("No duplicate files found based on size.");
                     return;
                 }
-                //!SECTION
+                // !SECTION
 
-                //SECTION STAGE 2: PARTIAL HASHING
+                // SECTION STAGE 2: PARTIAL HASHING
                 var partialHashGroups = await NewMethod(potentialPartialDuplicates, ct);
                 if (partialHashGroups == null || ct.IsCancellationRequested) return;
                 // !SECTION 
@@ -80,9 +80,9 @@ namespace FileDedupeApp.core
             var outputQueue = new BlockingCollection<FileEntry>(boundedCapacity: 1000);
             // TODO: Make worker count dynamic or configurable by user
             // Starting with 4 workers, change as needed after performance testing
-            #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             _hasher.Start(inputQueue, outputQueue, ComputePartialHash, workerCount: 4, ct);
-            #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             Console.WriteLine("back in main");
 
             var fillInputQueueTask = Task.Run(() =>
@@ -104,13 +104,13 @@ namespace FileDedupeApp.core
             foreach (var entry in outputQueue.GetConsumingEnumerable(ct))
             {
                 if (ct.IsCancellationRequested) return null;
-                #pragma warning disable CS8604 // Possible null reference argument.
+#pragma warning disable CS8604 // Possible null reference argument.
                 if (!hashGroups.TryGetValue(entry.Hash, out var group))
                 {
                     group = new List<FileEntry>();
                     hashGroups[entry.Hash] = group;
                 }
-                #pragma warning restore CS8604 // Possible null reference argument.
+#pragma warning restore CS8604 // Possible null reference argument.
                 group.Add(entry);
             }
 

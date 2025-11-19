@@ -1,4 +1,4 @@
-namespace FileDedupeApp.core
+namespace UQApp.core
 {
     // [Obsolete("This class is deprecated, use FileMetaData instead.")]
     public class FileEntry(string path, long size, string? hash = null)

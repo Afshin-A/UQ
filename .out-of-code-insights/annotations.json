@@ -34,7 +34,7 @@
   {
     "id": "mhwxyvuth8acxcuzgsp",
     "file": "FileDedupeApp/Program.cs",
-    "line": 6,
+    "line": 10,
     "message": "Provides a framework to manage the lifecycle of our application, dependency injection, logging, and configuration.",
     "author": "Afshin-A",
     "timestamp": "2025-11-13T04:41:22.373Z",

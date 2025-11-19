@@ -1,38 +1,13 @@
 ﻿
 // See https://aka.ms/new-console-template for more information
-using FileDedupeApp.core;
-
-
-
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using Serilog;
-
-/*
-// Console.WriteLine(@"              
-// Welcome   to    .oooooo.     
-// `888      `8  d8P'   `Y8b     
-//  888       8  888      888    
-//  888       8  888      888    
-//  888       8  888      888    
-//  `88.    .8'  `88b    d88b    
-//    `YbodP'     `Y8bood8P'Ybd'
-// ");
-Console.WriteLine("Starting File Dedupe Application");
-
-// @ is a verbatim string literal, useful for Windows paths. it treats backslashes as normal characters, so we don't have to escape them.
-var directories = args.Length > 0 ? args : [Environment.GetEnvironmentVariable("TestDirectory") ?? throw new ArgumentException("No directories provided via command line arguments or environment variable")];
-// var directories = args.Length > 0 ? args : [@"C:\Users\Afshin\Downloads\val2017\val2017-subset"];
-Console.WriteLine($"Accepted root directories: {string.Join(", ", directories)}");
-UQ.Run(directories);
-*/
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using UQApp.core;
 
 
-
-
-namespace FileDedupeApp
+namespace UQApp
 {
     /*class Program
 
@@ -116,7 +91,7 @@ namespace FileDedupeApp
                     });
                     logging.AddFilter("Microsoft", LogLevel.Warning)
                            .AddFilter("System", LogLevel.Warning)
-                           .AddFilter("FileDedupeApp.core.DuplicateFinderService", LogLevel.Information);
+                           .AddFilter("UQApp.core.UQService", LogLevel.Information);
                     logging.SetMinimumLevel(LogLevel.Information);
                 })
                 .ConfigureServices((hostContext, services) =>
@@ -124,11 +99,10 @@ namespace FileDedupeApp
                     services.Configure<UQOptions>(hostContext.Configuration);
                     services.AddTransient<DirectoryScanner>();
                     services.AddTransient<FileHasher>();
-                    services.AddHostedService<DuplicateFinderService>();
+                    services.AddHostedService<UQService>();
                 })
                 .Build()
                 .RunAsync();
         }
     }
-    
 }

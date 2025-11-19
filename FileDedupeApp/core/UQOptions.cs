@@ -1,4 +1,4 @@
-namespace FileDedupeApp.core
+namespace UQApp.core
 {
     public class UQOptions
     {
