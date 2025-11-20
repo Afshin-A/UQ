@@ -26,7 +26,8 @@ namespace UQApp.core
 
             Console.WriteLine(_configuration.GetValue<string>("SomeConfig"));
             //FIXME - Not working?
-            var directoriesToScan = _options.Value.Root;
+            var directoriesToScan = _options.Value.Roots;
+            Console.WriteLine(string.Join(", ", directoriesToScan));
 
             if (directoriesToScan == null || directoriesToScan.Count == 0)
             {
@@ -81,9 +82,8 @@ namespace UQApp.core
             // TODO: Make worker count dynamic or configurable by user
             // Starting with 4 workers, change as needed after performance testing
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-            _hasher.Start(inputQueue, outputQueue, ComputePartialHash, workerCount: 4, ct);
+            _hasher.Start(inputQueue, outputQueue, ComputePartialHash, ct);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-            Console.WriteLine("back in main");
 
             var fillInputQueueTask = Task.Run(() =>
             {

@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace UQApp.core
 {
@@ -8,16 +9,16 @@ namespace UQApp.core
         Task Start(BlockingCollection<FileEntry> inputQueue,
             BlockingCollection<FileEntry> outputQueue,
             Func<string, string> computeHashMethod,
-            int workerCount,
             CancellationToken ct);
     }
 
     /// <summary>
     ///  Uses the producer-consumer multi-threading pattern to process files from a BlockingCollection. computes their hashes, and adds FileEntry objects to another BlockingCollection<FileEntry>
     /// </summary>
-    public class FileHasher(ILogger<FileHasher> logger) : IFileHasher
+    public class FileHasher(ILogger<FileHasher> logger, IOptions<UQOptions> options) : IFileHasher
     {
         private readonly ILogger<FileHasher> _logger = logger;
+        private readonly IOptions<UQOptions> _options = options;
 
         /// <summary>
         /// Starts the file hashing process using multiple worker tasks.
@@ -35,10 +36,11 @@ namespace UQApp.core
             BlockingCollection<FileEntry> inputQueue,
             BlockingCollection<FileEntry> outputQueue,
             Func<string, string> computeHashMethod,
-            int workerCount,
             CancellationToken ct
         )
         {
+            int workerCount = _options.Value.Workers;
+            Console.WriteLine($"Starting FileHasher with {workerCount} workers.");
             var tasks = Enumerable.Range(0, workerCount).Select(_ => Task.Run(() =>
             {
                 // internally uses atomic operations to ensure thread-safety
