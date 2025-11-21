@@ -10,5 +10,7 @@ namespace UQApp.core
         // public int Workers { get; set; } = 4;
         public long MinSize { get; set; } = 1024; // 1 KB
         public bool Recursive { get; set; } = true;
+        public string Find { get; set; } = "*";
+        public string? Version { get; set; } = "1.0.0";
     }
 }

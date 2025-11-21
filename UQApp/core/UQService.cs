@@ -25,11 +25,7 @@ namespace UQApp.core
         {
 
             Console.WriteLine(_configuration.GetValue<string>("SomeConfig"));
-            //FIXME - Not working?
             var directoriesToScan = _options.Value.Roots;
-            Console.WriteLine("Directories to scan:");
-            Console.WriteLine(string.Join(", ", directoriesToScan));
-            // return;
 
             if (directoriesToScan == null || directoriesToScan.Count == 0)
             {

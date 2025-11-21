@@ -30,7 +30,6 @@ namespace UQApp.core
         /// <param name="inputQueue">A blocking collection containing file entries to be hashed.</param>
         /// <param name="outputQueue">A blocking collection to receive file entries with computed hashes.</param>
         /// <param name="computeHashMethod">A function that computes the hash for a given file path.</param>
-        /// <param name="workerCount">The number of concurrent worker tasks to use for hashing.</param>
         /// <param name="ct">A cancellation token to signal cancellation of the operation.</param>
         public async Task Start(
             BlockingCollection<FileEntry> inputQueue,

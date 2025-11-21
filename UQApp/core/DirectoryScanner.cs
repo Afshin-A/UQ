@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 
 namespace UQApp.core
@@ -21,11 +22,12 @@ namespace UQApp.core
     /// <param name="logger">
     /// The logger instance used for logging informational, warning, and error messages.
     /// </param>
-    public class DirectoryScanner(ILogger<DirectoryScanner> logger) : IDirectoryScanner
+    public class DirectoryScanner(ILogger<DirectoryScanner> logger, IOptions<UQOptions> options) : IDirectoryScanner
     {
         // NOTE: Use ConcurrentDictionary for thread safety if switching to parallel scanning in the future
         // private ConcurrentDictionary<long, ConcurrentBag<FileEntry>> _sizeGroups = new();
         private readonly ILogger<DirectoryScanner> _logger = logger;
+        private readonly IOptions<UQOptions> _options = options;
 
         /// <summary>
         /// Scans the specified root directories for files, grouping them by file size.
@@ -58,7 +60,9 @@ namespace UQApp.core
                     _logger.LogInformation("Directory scanning cancelled.");
                     return null;
                 }
-                foreach (var file in Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories))
+                SearchOption searchOption = _options.Value.Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+                string findPattern = _options.Value.Find;
+                foreach (var file in Directory.EnumerateFiles(root, findPattern, searchOption))
                 {
                     if (ct.IsCancellationRequested)
                     {

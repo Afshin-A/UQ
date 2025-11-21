@@ -17,15 +17,12 @@ namespace UQApp
         {
             Console.WriteLine(string.Join(" ", args));
 
-            // Console.WriteLine("""
-            // Welcome to UQ
-            // A File Uniquifier Tool
-            // """);
-            // Console.WriteLine();
-            foreach (var a in args)
-            {
-                Console.WriteLine($"ARG: [{a}]");
-            }
+            Console.WriteLine("""
+            Welcome to UQ
+            A File Uniquifier Tool
+            """);
+            Console.WriteLine();
+            
 
             if (args.Contains("--help") || args.Contains("-h"))
             {
@@ -39,10 +36,12 @@ namespace UQApp
                 dotnet run -- --roots:0 "C:\Data" --roots:1 "D:\MoreData" --min-size 1048576
                 
                 Options:
-                --roots:i <path>      Root directory to scan (can be used multiple times)
-                --workers <n>      Number of worker threads (default: CPU count)
-                --min-size <bytes> Minimum file size to consider
-                --help             Show this help
+                --roots:i <path>            Root directory to scan (can be used multiple times)
+                -w, --workers <n>           Number of worker threads (default: CPU count)
+                -r, --recursive <bool>      Scan directories recursively
+                -f, --find <regex>          Find duplicates without deleting
+                -v, --version               Show version information
+                -h, --help                  Show this help message
                 """);
                 return;
             }
@@ -67,8 +66,9 @@ namespace UQApp
                     {
                         { "--workers", "Workers" },
                         { "-w", "Workers" },
-                        { "--min-size", "MinSize" },
-                        { "-m", "MinSize" },
+                        { "-r", "Recursive" },
+                        { "-f", "Find" }
+
                     };
 
                     Console.WriteLine($"hosting env: {hostingContext.HostingEnvironment.EnvironmentName}");
