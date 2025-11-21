@@ -1,7 +1,9 @@
 ﻿
 // See https://aka.ms/new-console-template for more information
+using System.ComponentModel.Design.Serialization;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -13,28 +15,31 @@ namespace UQApp
     {
         public static async Task Main(string[] args)
         {
-            Console.WriteLine("""
-            Welcome to UQ
-            A File Uniquifier Tool
-            """);
-            Console.WriteLine();
+            Console.WriteLine(string.Join(" ", args));
 
-            // Collect directory/root arguments (flags or bare paths) before host build
-            var rootPaths = ParseRootPaths(args);
+            // Console.WriteLine("""
+            // Welcome to UQ
+            // A File Uniquifier Tool
+            // """);
+            // Console.WriteLine();
+            foreach (var a in args)
+            {
+                Console.WriteLine($"ARG: [{a}]");
+            }
 
             if (args.Contains("--help") || args.Contains("-h"))
             {
                 Console.WriteLine("""
-                You've entered help mode. Here's how to use UQ:
+                You've entered help mode. Create an issue or pull request @ https://github.com/Afshin-A/UQ
                 Usage:
                 dotnet run -- [paths...] [options]
                 
                 Examples:
-                dotnet run -- C:\Photos D:\Backup
-                dotnet run -- --root ""C:\Data"" --workers 12
+                dotnet run -- C:\Photos D:\Backup --workers 8
+                dotnet run -- --roots:0 "C:\Data" --roots:1 "D:\MoreData" --min-size 1048576
                 
                 Options:
-                --root <path>      Root directory to scan (can be used multiple times)
+                --roots:i <path>      Root directory to scan (can be used multiple times)
                 --workers <n>      Number of worker threads (default: CPU count)
                 --min-size <bytes> Minimum file size to consider
                 --help             Show this help
@@ -45,11 +50,25 @@ namespace UQApp
             await Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
+                    var roots = new List<string>();
+                    for (int i = 0; i < args.Length; i++)
+                    {
+                        if (args[i].StartsWith('-'))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            roots.Add(args[i]);
+                        }
+                    }
                     // Only scalar switches mapped here; directory flags handled manually
                     var switchMappings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                     {
                         { "--workers", "Workers" },
-                        { "--min-size", "MinSize" }
+                        { "-w", "Workers" },
+                        { "--min-size", "MinSize" },
+                        { "-m", "MinSize" },
                     };
 
                     Console.WriteLine($"hosting env: {hostingContext.HostingEnvironment.EnvironmentName}");
@@ -60,15 +79,8 @@ namespace UQApp
                         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                         .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
                         .AddEnvironmentVariables()
-                        .AddInMemoryCollection(rootPaths.Select((p, i) => new KeyValuePair<string,string?>($"Roots:{i}", p)))
+                        .AddInMemoryCollection(roots.Select((root, index) => new KeyValuePair<string, string?>($"Roots:{index}", root)))
                         .AddCommandLine(args, switchMappings);
-
-                    // Fallback if neither CLI nor config specifies Roots
-                    var built = config.Build();
-                    if (!built.GetSection("Roots").GetChildren().Any())
-                    {
-                        config.AddInMemoryCollection(new [] { new KeyValuePair<string,string?>("Roots:0", Directory.GetCurrentDirectory()) });
-                    }
                 })
                 .ConfigureLogging(logging =>
                 {
@@ -86,7 +98,7 @@ namespace UQApp
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.Configure<UQOptions>(hostContext.Configuration);
+                    services.Configure<UQOptions>(hostContext.Configuration); // bind configuration key-values to UQOptions
                     services.AddTransient<DirectoryScanner>();
                     services.AddTransient<FileHasher>();
                     services.AddHostedService<UQService>();
@@ -94,47 +106,5 @@ namespace UQApp
                 .Build()
                 .RunAsync();
         }
-
-        private static List<string> ParseRootPaths(string[] args)
-        {
-            var results = new List<string>();
-            var dirFlags = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            { "-d", "-dir", "--root", "--roots" };
-
-            for (int i = 0; i < args.Length; i++)
-            {
-                var current = args[i];
-                if (dirFlags.Contains(current))
-                {
-                    if (i + 1 < args.Length && !args[i + 1].StartsWith("-"))
-                    {
-                        var pathArg = args[++i];
-                        AddPath(results, pathArg);
-                    }
-                    continue;
-                }
-
-                if (!current.StartsWith("-"))
-                {
-                    AddPath(results, current);
-                }
-            }
-
-            return results;
-        }
-        private static void AddPath(List<string> list, string raw)
-            {
-                if (string.IsNullOrWhiteSpace(raw)) return;
-                try
-                {
-                    var full = Path.GetFullPath(raw);
-                    if (!list.Contains(full, StringComparer.OrdinalIgnoreCase))
-                        list.Add(full);
-                }
-                catch (Exception)
-                {
-                    
-                }
-            }
     }
 }
