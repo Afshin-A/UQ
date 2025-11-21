@@ -70,6 +70,13 @@ namespace UQApp.core
                         // TOOD: Remove this
                         // Console.WriteLine($"Scanning file: {file}");
                         var fileInfo = new FileInfo(file);
+
+                        // Skip empty files
+                        if (fileInfo.Length == 0)
+                        {
+                            continue;
+                        }
+
                         // checks if the key exists, but does not throw an exception if it doesn't, reducing overhead
                         // out variables are defiend by the method. The method outputs them to the caller. They become available to use by the caller
                         // In this case, if the key doesn't exists, we assign a new list to the out variable group
